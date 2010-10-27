@@ -17,8 +17,8 @@ module Onelogin::Saml
     end
     
     def is_valid?
-      unless @response.blank?
-        @document.validate(@settings.idp_cert_fingerprint, @logger) if @settings.idp_cert_fingerprint
+      if @settings.idp_cert_fingerprint && !@response.nil?
+        @document.validate(@settings.idp_cert_fingerprint, @logger)
       end
     end
 

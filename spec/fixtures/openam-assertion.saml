@@ -1,49 +1,71 @@
-<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s23a9f8344a9faa4058dafe53ece9ef3cde8680e1c" InResponseTo="5b51e930-c366-012d-1a88-0017f2dcb387" Version="2.0" IssueInstant="2010-10-26T19:37:22Z" Destination="http://localhost:3000/auth/authenticate"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://alex.awesomesauce.com:8080/opensso</saml:Issuer><samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
-<samlp:StatusCode  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-                   Value="urn:oasis:names:tc:SAML:2.0:status:Success">
-</samlp:StatusCode>
-</samlp:Status><saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="s2f3e53fc66972ef042ccd7105ff324baf158dcdf3" IssueInstant="2010-10-26T19:37:22Z" Version="2.0">
-<saml:Issuer>http://alex.awesomesauce.com:8080/opensso</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-<ds:SignedInfo>
-  <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-  <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-  <ds:Reference URI="#s2f3e53fc66972ef042ccd7105ff324baf158dcdf3">
-    <ds:Transforms>
-      <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
-      <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-    </ds:Transforms>
-    <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-    <ds:DigestValue>CUEBlNiqlyx0S0qZlGJOVUxuDjA=</ds:DigestValue>
-  </ds:Reference>
-</ds:SignedInfo>
-<ds:SignatureValue>
-  KkD3xEyFQmesZsoaGdUv/Bxg2R0RUI+0qiEvAetArBDFdRBqVIqbFXAgUlYT0aH79EKTIduLWgan
-  xNm4SVlUveIwORxwPBCvMccauze3mOjtb4WXoLLVGDLH/7MYs7Ejs1MSUI9bsorlipa/P8v+Kjnk
-  8p2GhF35Z7QinZVDA7o=
-</ds:SignatureValue>
-<ds:KeyInfo>
-  <ds:X509Data>
-    <ds:X509Certificate>
-      MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
-      bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
-      ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
-      CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
-      BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
-      AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
-      RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
-      Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
-      QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
-      cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
-      /FfwWigmrW0Y0Q==
-    </ds:X509Certificate>
-  </ds:X509Data>
-</ds:KeyInfo>
-</ds:Signature><saml:Subject>
-<saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" NameQualifier="http://alex.awesomesauce.com:8080/opensso">alex.redington@thinkrelevance.com</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
-<saml:SubjectConfirmationData InResponseTo="5b51e930-c366-012d-1a88-0017f2dcb387" NotOnOrAfter="2010-10-26T19:47:22Z" Recipient="http://localhost:3000/auth/authenticate"/></saml:SubjectConfirmation>
-</saml:Subject><saml:Conditions NotBefore="2010-10-26T19:27:22Z" NotOnOrAfter="2010-10-26T19:47:22Z">
-<saml:AudienceRestriction>
-  <saml:Audience>saml-example</saml:Audience>
-</saml:AudienceRestriction>
-</saml:Conditions>
-<saml:AuthnStatement AuthnInstant="2010-10-26T19:37:22Z" SessionIndex="s2e6b4136fc4d89516f99adc8921c004fa9718f401"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement><saml:AttributeStatement><saml:Attribute Name="uuid"><saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">3c678d50-c357-012d-1a87-0017f2dcb387</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion></samlp:Response>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s2b5907882870cc9a063fd3a5b9c6ee006923b2306" InResponseTo="5277fe50-c41b-012d-1a90-0017f2dcb387" Version="2.0" IssueInstant="2010-10-27T17:12:37Z" Destination="http://localhost:3000/auth/authenticate">
+  <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://dev.awesomesauce.com:8080/opensso</saml:Issuer>
+  <samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+    <samlp:StatusCode  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                       Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+    </samlp:StatusCode>
+  </samlp:Status>
+  <saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="s23c6278299445c7b9864f543cfb658ae849c0dc70" IssueInstant="2010-10-27T17:12:37Z" Version="2.0">
+    <saml:Issuer>http://dev.awesomesauce.com:8080/opensso</saml:Issuer>
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+      <ds:SignedInfo>
+        <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+        <ds:Reference URI="#s23c6278299445c7b9864f543cfb658ae849c0dc70">
+          <ds:Transforms>
+            <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          </ds:Transforms>
+          <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+          <ds:DigestValue>3Cny0/ed2lqMxwabzG9YMJ2DbIE=</ds:DigestValue>
+        </ds:Reference>
+      </ds:SignedInfo>
+      <ds:SignatureValue>
+        WOtkI1rBfCQFj+nBHM7wqsRPbP0IAAjazF8gSVtiyJKLLm1tY/wTBwcr7Aj4wlT/y9fuhOvH74vp
+        K9D9y1QMIl6G7sDDM5N7swresoB85/JDEO6K4WQG1OqLxgvTm2qKiTaraAJDNfX/zcgfsPY/paKp
+        FdQ3jjdjeA1heR67lxw=
+      </ds:SignatureValue>
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>
+            MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
+            bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
+            ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
+            CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
+            BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
+            AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
+            RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
+            Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
+            QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
+            cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
+            /FfwWigmrW0Y0Q==
+          </ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </ds:Signature>
+    <saml:Subject>
+      <saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" NameQualifier="http://dev.awesomesauce.com:8080/opensso">alex.redington@thinkrelevance.com</saml:NameID>
+      <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <saml:SubjectConfirmationData InResponseTo="5277fe50-c41b-012d-1a90-0017f2dcb387" NotOnOrAfter="2010-10-27T17:22:37Z" Recipient="http://localhost:3000/auth/authenticate"/>
+      </saml:SubjectConfirmation>
+    </saml:Subject>
+    <saml:Conditions NotBefore="2010-10-27T17:02:37Z" NotOnOrAfter="2010-10-27T17:22:37Z">
+      <saml:AudienceRestriction>
+        <saml:Audience>saml-example</saml:Audience>
+      </saml:AudienceRestriction>
+    </saml:Conditions>
+    <saml:AuthnStatement AuthnInstant="2010-10-27T17:10:36Z" SessionIndex="s2c6a7153c7fe14d1856f1260873c13f5cf1afea01">
+      <saml:AuthnContext>
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+      </saml:AuthnContext>
+    </saml:AuthnStatement>
+    <saml:AttributeStatement>
+      <saml:Attribute Name="name">
+        <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">happy</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="uuid">
+        <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">3c678d50-c357-012d-1a87-0017f2dcb387</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>

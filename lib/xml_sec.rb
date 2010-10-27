@@ -39,7 +39,7 @@ module XMLSecurity
       cert_text               = Base64.decode64(base64_cert)
       cert                    = OpenSSL::X509::Certificate.new(cert_text)
 
-      logger.debug("Received cert: #{cert}")
+      logger.debug("Received cert: #{cert}") if logger
       
       # check cert matches registered idp cert
       fingerprint             = Digest::SHA1.hexdigest(cert.to_der)
@@ -47,7 +47,7 @@ module XMLSecurity
       valid_flag              = fingerprint == expected_fingerprint
 
       unless valid_flag
-        logger.error("Validating SAML assertion failed fingerprint check, assertion fingerprint was #{fingerprint}, expected #{expected_fingerprint}") unless logger.nil?
+        logger.error("Validating SAML assertion failed fingerprint check, assertion fingerprint was #{fingerprint}, expected #{expected_fingerprint}") if logger
         return false
       end
       
@@ -81,27 +81,27 @@ module XMLSecurity
       # remove signature node
       sig_element = REXML::XPath.first(self, "//ds:Signature", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"})
       sig_element.remove
-      logger.debug("Removed signature node.")
+      logger.debug("Removed signature node.") if logger
       
       #check digests
       REXML::XPath.each(sig_element, "//ds:Reference", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}) do | ref |          
         
         uri                   = ref.attributes.get_attribute("URI").value
-        logger.debug("Digest URI: #{uri}")
+        logger.debug("Digest URI: #{uri}") if logger
         hashed_element        = REXML::XPath.first(self, "//[@ID='#{uri[1,uri.size]}']")
-        logger.debug("Hashed element: #{hashed_element}")
+        logger.debug("Hashed element: #{hashed_element}") if logger
         canoner               = XML::Util::XmlCanonicalizer.new(false, true)
         begin
           canon_hashed_element  = canoner.canonicalize(hashed_element)
         rescue Exception => exception
-          logger.debug("Exception raised trying to canonicalize the element. #{exception}, #{exception.backtrace}")
+          logger.debug("Exception raised trying to canonicalize the element. #{exception}, #{exception.backtrace}") if logger
         end
-        logger.debug("Canonical hashed element: #{canon_hashed_element}")
+        logger.debug("Canonical hashed element: #{canon_hashed_element}") if logger
         hash                  = Base64.encode64(Digest::SHA1.digest(canon_hashed_element)).chomp
         digest_value          = REXML::XPath.first(ref, "//ds:DigestValue", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}).text
         
         valid_flag            = hash == digest_value
-        logger.debug("Digest check for #{uri} passed: #{valid_flag}")
+        logger.debug("Digest check for #{uri} passed: #{valid_flag}") if logger
         
         return valid_flag if !valid_flag
       end
