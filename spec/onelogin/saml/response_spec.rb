@@ -13,7 +13,4 @@ describe Onelogin::Saml::Response do
     response["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
   end
 
-  it "should verify the request id as part of is_valid?"
-
-  it "should handle encrypted authentication responses"
 end
