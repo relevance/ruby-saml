@@ -44,7 +44,7 @@ module XMLSecurity
       # check cert matches registered idp cert
       fingerprint             = Digest::SHA1.hexdigest(cert.to_der)
       expected_fingerprint = idp_cert_fingerprint.gsub(":","").downcase
-      valid_flag              = fingerprint == idp_cert_fingerprint.gsub(":", "").downcase
+      valid_flag              = fingerprint == expected_fingerprint
 
       unless valid_flag
         logger.error("Validating SAML assertion failed fingerprint check, assertion fingerprint was #{fingerprint}, expected #{expected_fingerprint}") unless logger.nil?
@@ -53,6 +53,32 @@ module XMLSecurity
       
       validate_doc(base64_cert, logger)
     end
+
+    def saml_attributes
+      saml_attributes = {}
+
+puts "before the xpath statement"      
+      REXML::XPath.each(self,"//saml:AttributeStatement",
+                        {"saml" => "urn:oasis:names:tc:SAML:2.0:assertion"}) do |statement_element|
+puts statement_element.inspect        
+        statement_element.get_elements("./Attribute").each do |attribute_element|
+    puts attribute_element.inspect
+          attribute_element.get_elements("AttributeValue").each do |value_element|
+      puts value_element.inspect
+            unless saml_attributes[attribute_element.attributes["Name"]]
+              saml_attributes[attribute_element.attributes["Name"]] = value_element.text
+            else
+              prior_value = saml_attributes[attribute_element.attributes["Name"]]
+              saml_attributes[attribute_element.attributes["Name"]] = []
+              saml_attributes[attribute_element.attributes["Name"]] << prior_value
+              saml_attributes[attribute_element.attributes["Name"]] << value_element.text
+            end
+          end
+        end
+      end
+      saml_attributes
+    end
+    
     
     def validate_doc(base64_cert, logger)
       # validate references

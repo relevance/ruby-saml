@@ -2,16 +2,13 @@ PATH
   remote: .
   specs:
     ruby-saml (0.0.4)
-      XMLCanonicalizer (>= 1.0.1)
       uuid (= 2.3.1)
+      xmlcanonicalizer (>= 0.1.0)
 
 GEM
   remote: http://rubygems.org/
   specs:
-    XMLCanonicalizer (1.0.1)
-      log4r (>= 1.0.4)
     diff-lcs (1.1.2)
-    log4r (1.1.8)
     macaddr (1.0.0)
     rspec (2.0.0.rc)
       rspec-core (= 2.0.0.rc)
@@ -25,13 +22,16 @@ GEM
       rspec-expectations (= 2.0.0.rc)
     uuid (2.3.1)
       macaddr (~> 1.0)
+    watchr (0.7)
+    xmlcanonicalizer (0.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  XMLCanonicalizer (>= 1.0.1)
   bundler (>= 1.0.0)
   rspec (= 2.0.0.rc)
   ruby-saml!
   uuid (= 2.3.1)
+  watchr (= 0.7)
+  xmlcanonicalizer (>= 0.1.0)

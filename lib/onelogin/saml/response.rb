@@ -18,12 +18,16 @@ module Onelogin::Saml
     
     def is_valid?
       unless @response.blank?
-        @document.validate(@settings.idp_cert_fingerprint, @logger) unless !@settings.idp_cert_fingerprint
+        @document.validate(@settings.idp_cert_fingerprint, @logger) if @settings.idp_cert_fingerprint
       end
     end
 
     def name_id
       @document.elements["/samlp:Response/saml:Assertion/saml:Subject/saml:NameID"].text
+    end
+
+    def attributes
+      @document.saml_attributes
     end
   end
 end

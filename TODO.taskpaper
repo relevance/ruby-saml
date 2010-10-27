@@ -1,0 +1,9 @@
+* SAML research into attributes
+* Test functionality of ruby-saml gem
+* Create integration tests in saml-example
+* Additional parameters passed in SAML authentication request.
+* POST instead of GET with Authrequest.create
+* Rely on Erubis, use .erb templates to render the SAML authentication request.
+* Handle encrypted responses. (Double check with Mike & Bruce ETA on encrypted responses)
+* Enforce request id response id matching.
+* Refactor XMLSecurity::SignedDocument to be in the saml package

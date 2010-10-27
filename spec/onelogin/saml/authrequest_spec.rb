@@ -1,5 +1,8 @@
 require 'spec_helper'
+require 'base64'
 
-describe "placeholder" do
-  it "should do something"
-end 
+#describe Onelogin::Saml::AuthRequest do
+ # it "should pull attributes from authentication responses" do
+    
+ # end
+#end 
