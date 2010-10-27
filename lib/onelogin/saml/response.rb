@@ -29,5 +29,9 @@ module Onelogin::Saml
     def attributes
       @document.saml_attributes
     end
+
+    def [](key)
+      self.attributes[key]
+    end
   end
 end

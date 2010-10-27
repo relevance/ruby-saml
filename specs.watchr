@@ -35,6 +35,7 @@ watch('^spec/(.*)_spec\.rb'  )          { |m| run_test_matching(m[1]) }
 #watch('^app/(.*)\.rb'               )   { |m| run_test_matching(m[1]) }
 #watch('^app/views/(.*)/(.*)')           { |m| run_test_matching(m[1]) }
 watch('^lib/(.*)\.rb'               )   { |m| run_test_matching(m[1]) }
+watch('^lib/xml_sec.rb')                { run "spec/onelogin/saml/response_spec.rb" }
 watch('^config/routes.rb')              { run_all_tests }
 watch('^spec/spec_helper\.rb')          { run_all_tests }
 

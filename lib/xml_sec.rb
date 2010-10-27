@@ -57,14 +57,12 @@ module XMLSecurity
     def saml_attributes
       saml_attributes = {}
 
-puts "before the xpath statement"      
       REXML::XPath.each(self,"//saml:AttributeStatement",
                         {"saml" => "urn:oasis:names:tc:SAML:2.0:assertion"}) do |statement_element|
-puts statement_element.inspect        
-        statement_element.get_elements("./Attribute").each do |attribute_element|
-    puts attribute_element.inspect
-          attribute_element.get_elements("AttributeValue").each do |value_element|
-      puts value_element.inspect
+        REXML::XPath.each(statement_element, "./saml:Attribute",
+                          {"saml" => "urn:oasis:names:tc:SAML:2.0:assertion"}) do |attribute_element|
+          REXML::XPath.each(attribute_element, "./saml:AttributeValue",
+                            {"saml" => "urn:oasis:names:tc:SAML:2.0:assertion"}) do |value_element|
             unless saml_attributes[attribute_element.attributes["Name"]]
               saml_attributes[attribute_element.attributes["Name"]] = value_element.text
             else
