@@ -101,6 +101,7 @@ module XMLSecurity
         digest_value          = REXML::XPath.first(ref, "//ds:DigestValue", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}).text
         
         valid_flag            = hash == digest_value
+        logger.debug("calculated hash: #{hash}, expected_hash: #{digest_value}") if logger
         logger.debug("Digest check for #{uri} passed: #{valid_flag}") if logger
         
         return valid_flag if !valid_flag
