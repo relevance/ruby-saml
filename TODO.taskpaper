@@ -1,17 +1,13 @@
-* SAML research into attributes
-  - In progress, implementing attribute consumption.
-* Test functionality of ruby-saml gem
-  - On going
-* Create integration tests in saml-example
-* Additional parameters passed in SAML authentication request.
-* POST instead of GET with Authrequest.create
-  -Low priority for OpenAM integration today, long term tech debt, could cause 
-  problems in the future
-* Rely on Erubis, use .erb templates to render the SAML authentication request.
-  -Low priority, cleans up ruby-saml code.
-* Handle encrypted responses. (Double check with Mike & Bruce ETA on encrypted responses)
-  -Must have for integrating with UIS.
-* Enforce request id response id matching.
-  -Must have for security.
-* Refactor XMLSecurity::SignedDocument to be in the saml package
-  -Could fold into handling encrypted responses.
+Ruby SAML improvements:
+- SAML research into attributes @in-progress
+	- Tracked by internal ticket #118
+- Test functionality of ruby-saml gem
+	- Will be an on-going "tax" on all tasks; we'll add tests as necessary
+- Create integration tests in saml-example
+- Additional parameters passed in SAML authentication request.
+- POST instead of GET with Authrequest.create @low-priority
+	- Low priority for OpenAM integration today, long term tech debt, could cause problems in the future
+- Rely on Erubis, use .erb templates to render the SAML authentication request. @low-priority
+- Handle encrypted responses. @high-priority
+	- Refactor XMLSecurity::SignedDocument to be in the saml package @low-priority
+- Enforce request id response id matching. @high-priority
