@@ -1,10 +1,10 @@
 require "base64"
 require "uuid"
-require "erb"
+require "cgi"
 
 module Onelogin::Saml
   class Authrequest
-    def create(settings)
+    def create(settings, params = {})
       id                = Onelogin::Saml::Authrequest.generateUniqueID(42)
       issue_instant     = Onelogin::Saml::Authrequest.getTimestamp
 
@@ -18,9 +18,10 @@ module Onelogin::Saml
 
       deflated_request  = Zlib::Deflate.deflate(request, 9)[2..-5]     
       base64_request    = Base64.encode64(deflated_request)  
-      encoded_request   = CGI.escape(base64_request)  
-  
-      settings.idp_sso_target_url + "?SAMLRequest=" + encoded_request
+      params["SAMLRequest"] = base64_request
+      query_string = params.map {|key, value| "#{key}=#{CGI.escape(value)}"}.join("&")
+      
+      settings.idp_sso_target_url + "?#{query_string}"
     end
     
     private 
