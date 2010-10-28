@@ -1,5 +1,6 @@
 require "base64"
 require "uuid"
+require "erb"
 
 module Onelogin::Saml
   class Authrequest

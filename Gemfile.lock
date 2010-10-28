@@ -1,9 +1,15 @@
+GIT
+  remote: git://github.com/relevance/xmlcanonicalizer.git
+  revision: a3fde2f7edb4caa92957a42654e3cc2360ba7204
+  specs:
+    xmlcanonicalizer (0.1.1)
+
 PATH
   remote: .
   specs:
     ruby-saml (0.0.4)
       uuid (= 2.3.1)
-      xmlcanonicalizer (>= 0.1.0)
+      xmlcanonicalizer (= 0.1.1)
 
 GEM
   remote: http://rubygems.org/
@@ -23,7 +29,6 @@ GEM
     uuid (2.3.1)
       macaddr (~> 1.0)
     watchr (0.7)
-    xmlcanonicalizer (0.1.0)
 
 PLATFORMS
   ruby
@@ -34,4 +39,4 @@ DEPENDENCIES
   ruby-saml!
   uuid (= 2.3.1)
   watchr (= 0.7)
-  xmlcanonicalizer (>= 0.1.0)
+  xmlcanonicalizer (= 0.1.1)
