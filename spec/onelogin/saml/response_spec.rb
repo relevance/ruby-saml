@@ -1,8 +1,9 @@
 require 'spec_helper'
 require 'base64'
+require 'logger'
 
 describe Onelogin::Saml::Response do
-  let(:raw_saml) { File.open(File.dirname(__FILE__) + '/../../fixtures/openam-assertion.saml').read }
+  let(:raw_saml) { File.open(File.dirname(__FILE__) + '/../../fixtures/test4.xml').read }
 
   let(:settings) do
     settings = Onelogin::Saml::Settings.new
@@ -18,10 +19,8 @@ describe Onelogin::Saml::Response do
 
   let(:response) do
     response = Onelogin::Saml::Response.new(Base64.encode64(raw_saml))
-    
     response.settings = settings
-#    response.logger = Logger.new(STDOUT)
-    
+    #response.logger = Logger.new(STDOUT) # add this line for debugging
     response
   end
 
@@ -35,8 +34,8 @@ describe Onelogin::Saml::Response do
     response["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
   end
 
-  # it "should fail when a response's expiration date has passed" do
-  #   response.is_valid?.should != true
-  # end
+  it "should validate the document successfully when attributes are present" do
+    response.is_valid?.should == true
+  end
 
 end
