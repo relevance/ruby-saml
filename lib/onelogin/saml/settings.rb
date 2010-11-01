@@ -1,45 +1,12 @@
 module Onelogin::Saml
   class Settings
-    def assertion_consumer_service_url
-      @assertion_consumer_service_url
-    end
-    def assertion_consumer_service_url=(val)
-      @assertion_consumer_service_url = val
-    end
-    
-    def issuer
-      @issuer
-    end
-    def issuer=(val)
-      @issuer = val
-    end
-    
-    def sp_name_qualifier
-      @sp_name_qualifier
-    end
-    def sp_name_qualifier=(val)
-      @sp_name_qualifier = val
-    end
-    
-    def idp_sso_target_url
-      @idp_sso_target_url
-    end
-    def idp_sso_target_url=(val)
-      @idp_sso_target_url = val
-    end
-    
-    def idp_cert_fingerprint
-      @idp_cert_fingerprint
-    end
-    def idp_cert_fingerprint=(val)
-      @idp_cert_fingerprint = val
-    end
-    
-    def name_identifier_format
-      @name_identifier_format
-    end
-    def name_identifier_format=(val)
-      @name_identifier_format = val
-    end
+    attr_accessor :assertion_consumer_service_url
+    attr_accessor :issuer
+    attr_accessor :sp_name_qualifier
+    attr_accessor :idp_sso_target_url
+    attr_accessor :idp_cert_fingerprint
+    attr_accessor :name_identifier_format
+    attr_accessor :private_key
+    attr_accessor :private_key_password
   end
 end
