@@ -4,17 +4,17 @@ require "xml_sec"
 
 module Onelogin::Saml
   class Response
-    def initialize(response)
+
+    attr_accessor :expected_transaction_id
+    attr_writer :logger
+    attr_writer :settings
+    
+    def initialize(response, opts = {})
       @response = response
       @document = XMLSecurity::SignedDocument.new(Base64.decode64(@response))
-    end
-    
-    def logger=(val)
-      @logger = val
-    end
-    
-    def settings=(_settings)
-      @settings = _settings
+      if opts.has_key?(:expected_transaction_id)
+        @expected_transaction_id = opts[:expected_transaction_id]
+      end
     end
     
     def is_valid?
@@ -23,6 +23,7 @@ module Onelogin::Saml
         valid &&= @document.validate(@settings.idp_cert_fingerprint, @logger)
       end
       valid &&= within_time_window?
+      valid &&= transaction_id_sync?
       return valid
     end
 
@@ -63,6 +64,23 @@ module Onelogin::Saml
     ENCRYPTED_RESPONSE_DATA_PATH = "/samlp:Response/saml:EncryptedAssertion/xenc:EncryptedData/"
     ENCRYPTED_AES_KEY_PATH = "./ds:KeyInfo/xenc:EncryptedKey/xenc:CipherData/xenc:CipherValue"
     ENCRYPTED_ASSERTION_PATH = "./xenc:CipherData/xenc:CipherValue"
+    SUBJECT_CONFIRMATION_DATA_PATH = "./saml:Subject/saml:SubjectConfirmation/saml:SubjectConfirmationData"
+
+    def transaction_id
+      confirmation_element = assertion_doc.elements[SUBJECT_CONFIRMATION_DATA_PATH]
+      confirmation_element.attribute("InResponseTo").value
+    end
+
+    def samlp_transaction_id
+      samlp_response = @document.root
+      samlp_response.attribute("InResponseTo").value
+    end
+    
+    def transaction_id_sync?
+      return false unless transaction_id == samlp_transaction_id
+      return true unless @expected_transaction_id
+      transaction_id == @expected_transaction_id
+    end
 
     def within_time_window?
       conditions_element = assertion_doc.elements["./saml:Conditions"]

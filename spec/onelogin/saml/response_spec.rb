@@ -9,6 +9,8 @@ describe Onelogin::Saml::Response do
 
   let(:encrypted_saml) {File.open(File.dirname(__FILE__) + '/../../fixtures/saml-encrypted-assertion.xml').read }
 
+  let(:busted_id_saml) {File.open(File.dirname(__FILE__) + '/../../fixtures/saml-assertion-with-busted-ids.xml').read }
+
   let(:settings) do
     settings = Onelogin::Saml::Settings.new
     
@@ -35,6 +37,20 @@ describe Onelogin::Saml::Response do
     response = Onelogin::Saml::Response.new(Base64.encode64(encrypted_saml))
     response.settings = settings
     response
+  end
+
+  let(:busted_id_response) do
+    response = Onelogin::Saml::Response.new(Base64.encode64(busted_id_saml))
+    response.settings = settings
+    response
+  end
+
+  let (:response_time_freeze) do
+    Time.parse("October 28th, 2010 1:35pm UTC")
+  end
+
+  let(:encrypted_response_time_freeze) do
+    Time.parse("November 1st, 2010 8:17pm UTC")
   end
   
   describe "name_id" do
@@ -65,20 +81,20 @@ describe Onelogin::Saml::Response do
 
   describe "valid?" do
     it "should validate the document successfully when attributes are present" do
-      Timecop.freeze(Time.parse("October 28th, 2010 1:35pm UTC")) do
+      Timecop.freeze(response_time_freeze) do
         response.should be_valid
       end
     end
 
     it "should validate an encrypted document successfully" do
-      Timecop.freeze(Time.parse("November 1st, 2010 8:17pm UTC")) do
+      Timecop.freeze(encrypted_response_time_freeze) do
         encrypted_response.should be_valid
       end
     end
 
     it "should be able to call validate twice" do
       pending("make this test pass by not changing DOM in validation method") do
-        Timecop.freeze(Time.parse("October 28th, 2010 1:35pm UTC")) do
+        Timecop.freeze(response_time_freeze) do
           response.should be_valid
           response.should be_valid
         end
@@ -99,11 +115,39 @@ describe Onelogin::Saml::Response do
       end
       
       it "documents are valid only within their expiration dates" do
-        Timecop.freeze(Time.parse("October 28th, 2010 1:35pm UTC")) do
+        Timecop.freeze(response_time_freeze) do
           response.should be_valid
         end
       end
       
+    end
+
+    describe "with transaction ids" do
+      it "documents are valid if no transaction id is provided" do
+        Timecop.freeze(response_time_freeze) do
+          response.should be_valid
+        end
+      end
+
+      it "documents are valid if a matching transaction id is provided" do
+        Timecop.freeze(response_time_freeze) do
+          response.expected_transaction_id = "294e5540-c4c6-012d-1a98-0017f2dcb387"
+          response.should be_valid
+        end
+      end
+
+      it "documents are NOT valid if the expected transaction id does not match the document's transaction id" do
+        Timecop.freeze(response_time_freeze) do
+          response.expected_transaction_id = "quux-zot-bar-foo-baz"
+          response.should_not be_valid
+        end
+      end
+
+      it "is NOT valid if the two transaction IDs in the document do NOT match" do
+        Timecop.freeze(response_time_freeze) do
+          busted_id_response.should_not be_valid
+        end        
+      end
     end
   end
   
