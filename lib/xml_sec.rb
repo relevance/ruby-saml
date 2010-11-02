@@ -54,27 +54,8 @@ module XMLSecurity
       validate_doc(base64_cert, logger)
     end
 
-    def saml_attributes
-      saml_attributes = {}
-      
-      each_saml_attribute(self,"//saml:AttributeStatement") do |statement_element|
-        each_saml_attribute(statement_element, "./saml:Attribute") do |attribute_element|
-          each_saml_attribute(attribute_element, "./saml:AttributeValue") do |value_element|
-            attr_name = attribute_element.attributes["Name"]            
-            saml_attributes[attr_name] = value_element.text
-          end
-        end
-      end
-      
-      saml_attributes
-    end
-
     private
-    
-    def each_saml_attribute(element, selector, &blk)
-      REXML::XPath.each(element, selector, {"saml" => "urn:oasis:names:tc:SAML:2.0:assertion"},  &blk)
-    end
-    
+        
     def validate_doc(base64_cert, logger)
       # validate references
       

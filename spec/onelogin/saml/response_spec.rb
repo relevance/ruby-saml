@@ -36,6 +36,10 @@ describe Onelogin::Saml::Response do
     response
   end
 
+  it "should pull the name id from authentication response" do
+    response.name_id.should == "alex.redington@thinkrelevance.com"
+  end
+
   it "should pull attributes from authentication responses" do
     response.attributes["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
     response.attributes["name"].should == "happy"
@@ -51,6 +55,11 @@ describe Onelogin::Saml::Response do
 
   it "should parse encrypted responses correctly" do
     encrypted_response.name_id.should == "demo@example.com"
+  end
+
+  it "should parse attributes out of encrypted responses correctly" do
+    encrypted_response.attributes["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
+    encrypted_response["name"].should == "happy"
   end
     
 end
