@@ -23,6 +23,13 @@ module Onelogin::Saml
       end
     end
 
+    alias :valid? :is_valid?
+    alias :is_valid :is_valid?
+
+    def encrypted?
+      !!@document.elements[ENCRYPTED_RESPONSE_DATA_PATH]
+    end
+
     def name_id
       return assertion_doc.elements[NAME_ID_PATH].text
     end
@@ -85,6 +92,7 @@ module Onelogin::Saml
     end
 
     def decrypt_assertion_document
+      @encrypted = true
       cipher_data = @document.elements[ENCRYPTED_RESPONSE_DATA_PATH]
       aes_key = retrieve_symmetric_key(cipher_data)
       encrypted_assertion = Base64.decode64(cipher_data.elements[ENCRYPTED_ASSERTION_PATH].text)

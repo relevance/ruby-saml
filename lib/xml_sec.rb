@@ -60,8 +60,10 @@ module XMLSecurity
       # validate references
       
       # remove signature node
-      sig_element = REXML::XPath.first(self, "//ds:Signature", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"})
-      sig_element.remove
+      doc = self
+
+      sig_element = REXML::XPath.first(doc, "//ds:Signature", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"})
+
       logger.debug("Removed signature node.") if logger
       
       #check digests
@@ -69,7 +71,9 @@ module XMLSecurity
         
         uri                   = ref.attributes.get_attribute("URI").value
         logger.debug("Digest URI: #{uri}") if logger
-        hashed_element        = REXML::XPath.first(self, "//[@ID='#{uri[1,uri.size]}']")
+        parent = sig_element.parent
+        sig_element.remove
+        hashed_element        = REXML::XPath.first(doc, "//[@ID='#{uri[1,uri.size]}']")
         logger.debug("Hashed element: #{hashed_element}") if logger
         canoner               = XML::Util::XmlCanonicalizer.new(false, true)
         begin
@@ -77,9 +81,11 @@ module XMLSecurity
         rescue Exception => exception
           logger.debug("Exception raised trying to canonicalize the element. #{exception}, #{exception.backtrace}") if logger
         end
+
         logger.debug("Canonical hashed element: #{canon_hashed_element}") if logger
         hash                  = Base64.encode64(Digest::SHA1.digest(canon_hashed_element)).chomp
         digest_value          = REXML::XPath.first(ref, "//ds:DigestValue", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}).text
+
         
         valid_flag            = hash == digest_value
         logger.debug("calculated hash: #{hash}, expected_hash: #{digest_value}") if logger
@@ -101,7 +107,7 @@ module XMLSecurity
       cert                    = OpenSSL::X509::Certificate.new(cert_text)
       
       valid_flag              = cert.public_key.verify(OpenSSL::Digest::SHA1.new, signature, canon_string)
-        
+
       return valid_flag
     end
    

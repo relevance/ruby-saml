@@ -35,31 +35,57 @@ describe Onelogin::Saml::Response do
     response.settings = settings
     response
   end
+  
+  describe "name_id" do
+    it "should pull the name id from authentication response" do
+      response.name_id.should == "alex.redington@thinkrelevance.com"
+    end
 
-  it "should pull the name id from authentication response" do
-    response.name_id.should == "alex.redington@thinkrelevance.com"
+    it "should pull the name_id from encrypted responses correctly" do
+      encrypted_response.name_id.should == "demo@example.com"
+    end
   end
 
-  it "should pull attributes from authentication responses" do
-    response.attributes["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
-    response.attributes["name"].should == "happy"
-  end
-
-  it "should expose attributes directly on the response object" do
-    response["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
-  end
-
-  it "should validate the document successfully when attributes are present" do
-    response.is_valid?.should == true
-  end
-
-  it "should parse encrypted responses correctly" do
-    encrypted_response.name_id.should == "demo@example.com"
-  end
-
-  it "should parse attributes out of encrypted responses correctly" do
-    encrypted_response.attributes["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
-    encrypted_response["name"].should == "happy"
-  end
+  describe "attributes" do 
+    it "should pull attributes from authentication responses" do
+      response.attributes["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
+      response.attributes["name"].should == "happy"
+    end
     
+    it "should expose attributes directly on the response object" do
+      response["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
+    end
+
+    it "should parse attributes out of encrypted responses correctly" do
+      encrypted_response.attributes["uuid"].should == "3c678d50-c357-012d-1a87-0017f2dcb387"
+      encrypted_response["name"].should == "happy"
+    end
+  end
+
+  describe "valid?" do
+    it "should validate the document successfully when attributes are present" do
+      response.should be_valid
+    end
+
+    it "should validate an encrypted document successfully" do
+      encrypted_response.should be_valid
+    end
+
+    it "should be able to call validate twice" do
+      pending("make this test pass by not changing DOM in validation method") do
+        response.should be_valid
+        response.should be_valid
+      end
+    end
+  end
+  
+  describe "encrypted?" do
+    it "should return false if the response was NOT encrypted" do
+      response.should_not be_encrypted
+    end
+
+    it "should return true if the response was encrypted" do
+      encrypted_response.should be_encrypted
+    end
+  end
 end
