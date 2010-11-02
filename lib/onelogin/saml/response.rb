@@ -18,9 +18,12 @@ module Onelogin::Saml
     end
     
     def is_valid?
+      valid = true
       if @settings.idp_cert_fingerprint && !@response.nil?
-        @document.validate(@settings.idp_cert_fingerprint, @logger)
+        valid &&= @document.validate(@settings.idp_cert_fingerprint, @logger)
       end
+      valid &&= within_time_window?
+      return valid
     end
 
     alias :valid? :is_valid?
@@ -60,6 +63,14 @@ module Onelogin::Saml
     ENCRYPTED_RESPONSE_DATA_PATH = "/samlp:Response/saml:EncryptedAssertion/xenc:EncryptedData/"
     ENCRYPTED_AES_KEY_PATH = "./ds:KeyInfo/xenc:EncryptedKey/xenc:CipherData/xenc:CipherValue"
     ENCRYPTED_ASSERTION_PATH = "./xenc:CipherData/xenc:CipherValue"
+
+    def within_time_window?
+      conditions_element = assertion_doc.elements["./saml:Conditions"]
+      time_window_open = Time.parse(conditions_element.attribute("NotBefore").value)
+      time_window_close = Time.parse(conditions_element.attribute("NotOnOrAfter").value)
+      now = Time.now
+      now >= time_window_open && now < time_window_close
+    end
 
     def each_saml_attribute(element, selector, &blk)
       REXML::XPath.each(element, selector, {"saml" => "urn:oasis:names:tc:SAML:2.0:assertion"},  &blk)
