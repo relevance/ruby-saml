@@ -19,9 +19,9 @@ module Onelogin::Saml
     
     def is_valid?
       valid = true
-      if @settings.idp_cert_fingerprint && !@response.nil?
-        valid &&= @document.validate(@settings.idp_cert_fingerprint, @logger)
-      end
+      valid &&= @document.validate_fingerprint(@settings.idp_cert_fingerprint, @logger) if @settings.idp_cert_fingerprint
+      valid &&= @document.validate_digests(@logger)
+      valid &&= @document.validate_signature(@logger)
       valid &&= within_time_window?
       valid &&= transaction_id_sync?
       return valid

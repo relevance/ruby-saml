@@ -33,13 +33,14 @@ module XMLSecurity
 
   class SignedDocument < REXML::Document
 
-    def validate (idp_cert_fingerprint, logger = nil)
+    DS_NAMESPACE = {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}
+
+    def validate_fingerprint(idp_cert_fingerprint, logger = nil)
       # get cert from response
-      base64_cert             = self.elements["//ds:X509Certificate"].text
       cert_text               = Base64.decode64(base64_cert)
       cert                    = OpenSSL::X509::Certificate.new(cert_text)
 
-      logger.debug("Received cert: #{cert}") if logger
+      debug("Received cert: #{cert}",logger)
       
       # check cert matches registered idp cert
       fingerprint             = Digest::SHA1.hexdigest(cert.to_der)
@@ -48,58 +49,61 @@ module XMLSecurity
 
       unless valid_flag
         logger.error("Validating SAML assertion failed fingerprint check, assertion fingerprint was #{fingerprint}, expected #{expected_fingerprint}") if logger
-        return false
+      #  return false
       end
-      
-      validate_doc(base64_cert, logger)
+
+      return valid_flag
+      #validate_doc(base64_cert, logger)
     end
 
-    private
-        
-    def validate_doc(base64_cert, logger)
+    def validate_digests(logger)
       # validate references
       
       # remove signature node
       doc = self.deep_clone
 
-      sig_element = REXML::XPath.first(doc, "//ds:Signature", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"})
+      sig_element = sig_element(doc)
 
-      logger.debug("Removed signature node.") if logger
-      
       #check digests
-      REXML::XPath.each(sig_element, "//ds:Reference", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}) do | ref |          
+      REXML::XPath.each(sig_element, "//ds:Reference", DS_NAMESPACE) do | ref |          
         
         uri                   = ref.attributes.get_attribute("URI").value
-        logger.debug("Digest URI: #{uri}") if logger
+        debug("Digest URI: #{uri}",logger)
         parent = sig_element.parent
         sig_element.remove
         hashed_element        = REXML::XPath.first(doc, "//[@ID='#{uri[1,uri.size]}']")
-        logger.debug("Hashed element: #{hashed_element}") if logger
+        debug("Hashed element: #{hashed_element}",logger)
         canoner               = XML::Util::XmlCanonicalizer.new(false, true)
         begin
           canon_hashed_element  = canoner.canonicalize(hashed_element)
         rescue Exception => exception
-          logger.debug("Exception raised trying to canonicalize the element. #{exception}, #{exception.backtrace}") if logger
+          debug("Exception raised trying to canonicalize the element. #{exception}, #{exception.backtrace}",logger)
         end
 
-        logger.debug("Canonical hashed element: #{canon_hashed_element}") if logger
+        debug("Canonical hashed element: #{canon_hashed_element}",logger)
         hash                  = Base64.encode64(Digest::SHA1.digest(canon_hashed_element)).chomp
-        digest_value          = REXML::XPath.first(ref, "//ds:DigestValue", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}).text
+        digest_value          = REXML::XPath.first(ref, "//ds:DigestValue", DS_NAMESPACE).text
 
         
         valid_flag            = hash == digest_value
-        logger.debug("calculated hash: #{hash}, expected_hash: #{digest_value}") if logger
-        logger.debug("Digest check for #{uri} passed: #{valid_flag}") if logger
+        debug("calculated hash: #{hash}, expected_hash: #{digest_value}",logger)
+        debug("Digest check for #{uri} passed: #{valid_flag}",logger)
         
         return valid_flag if !valid_flag
       end
+      return true
+    end
+
+    def validate_signature(logger = nil)
+      doc = self.deep_clone
+      sig_element = sig_element(doc)
  
       # verify signature
       canoner                 = XML::Util::XmlCanonicalizer.new(false, true)
-      signed_info_element     = REXML::XPath.first(sig_element, "//ds:SignedInfo", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"})
+      signed_info_element     = REXML::XPath.first(sig_element, "//ds:SignedInfo", DS_NAMESPACE)
       canon_string            = canoner.canonicalize(signed_info_element)
 
-      base64_signature        = REXML::XPath.first(sig_element, "//ds:SignatureValue", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}).text
+      base64_signature        = REXML::XPath.first(sig_element, "//ds:SignatureValue", DS_NAMESPACE).text
       signature               = Base64.decode64(base64_signature)
       
       # get certificate object
@@ -109,6 +113,20 @@ module XMLSecurity
       valid_flag              = cert.public_key.verify(OpenSSL::Digest::SHA1.new, signature, canon_string)
 
       return valid_flag
+    end
+
+    private
+
+    def sig_element(document)
+      REXML::XPath.first(document, "//ds:Signature", DS_NAMESPACE)
+    end      
+
+    def base64_cert
+      self.elements["//ds:X509Certificate"].text
+    end
+    
+    def debug(message,logger)
+      logger.debug(message) if logger
     end
    
   end
