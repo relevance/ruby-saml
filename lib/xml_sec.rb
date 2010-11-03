@@ -60,7 +60,7 @@ module XMLSecurity
       # validate references
       
       # remove signature node
-      doc = self
+      doc = self.deep_clone
 
       sig_element = REXML::XPath.first(doc, "//ds:Signature", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"})
 

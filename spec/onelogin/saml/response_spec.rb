@@ -93,11 +93,9 @@ describe Onelogin::Saml::Response do
     end
 
     it "should be able to call validate twice" do
-      pending("make this test pass by not changing DOM in validation method") do
-        Timecop.freeze(response_time_freeze) do
-          response.should be_valid
-          response.should be_valid
-        end
+      Timecop.freeze(response_time_freeze) do
+        response.should be_valid
+        response.should be_valid
       end
     end
 
