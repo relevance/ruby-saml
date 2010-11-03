@@ -5,6 +5,36 @@
 * To install the gem run "sudo gem install pkg/ruby-saml-x.x.x.gem"
 * To run tests run "rake" or "rake spec"
 
+== Transaction ID verification
+
+To verify SAML response ID's match the outgoing request, clients of this gem must do two things:
+1 - Cache the outgoing transaction ID.
+2 - Provide the SAML library the cached transaction ID.
+
+For example, in a Rails application, you can store the transaction ID in the user's session as follows:
+
+  saml_request = Onelogin::Saml::Authrequest.new
+  session[:saml_transaction_id] = saml_request.transaction_id
+  redirect_to(saml_request.create(settings))
+
+Once the user returns from the IDP with a SAML response, enforce transaction ID matches as follows:
+
+  saml_response = Onelogin::Saml::Response.new(params[:SAMLResponse])
+  saml_response.settings = settings
+  unless session[:saml_transaction_id]
+    redirect_to(:action => "denied") and return
+  end
+  saml_response.expected_transaction_id = session[:saml_transaction_id]
+  if saml_response.valid? and saml_response.name_id
+    session[:username] = saml_response.name_id
+    redirect_to "/auth/index"
+  else
+    redirect_to "/auth/denied"
+  end
+
+Once expected_transaction_id is set on a Onelogin::Saml::Response, all calls to valid? will
+check the response's ID against the provided id.
+
 == Note on Patches/Pull Requests
  
 * Fork the project.
