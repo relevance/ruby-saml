@@ -36,94 +36,78 @@ module XMLSecurity
     DS_NAMESPACE = {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}
 
     def validate_fingerprint(idp_cert_fingerprint, logger = nil)
-      # get cert from response
-      cert_text               = Base64.decode64(base64_cert)
-      cert                    = OpenSSL::X509::Certificate.new(cert_text)
-
       debug("Received cert: #{cert}",logger)
       
-      # check cert matches registered idp cert
-      fingerprint             = Digest::SHA1.hexdigest(cert.to_der)
+      fingerprint = Digest::SHA1.hexdigest(cert.to_der)
       expected_fingerprint = idp_cert_fingerprint.gsub(":","").downcase
-      valid_flag              = fingerprint == expected_fingerprint
+      valid = fingerprint == expected_fingerprint
 
-      unless valid_flag
-        logger.error("Validating SAML assertion failed fingerprint check, assertion fingerprint was #{fingerprint}, expected #{expected_fingerprint}") if logger
-      #  return false
+      if valid
+        debug("assertion fingerprint matched", logger)
+      else
+        debug("assertion did not match; fingerprint was #{fingerprint}, expected #{expected_fingerprint}",logger)
       end
-
-      return valid_flag
-      #validate_doc(base64_cert, logger)
+      
+      valid
     end
 
     def validate_digests(logger)
-      # validate references
-      
-      # remove signature node
       doc = self.deep_clone
-
       sig_element = sig_element(doc)
+      sig_element.remove
 
-      #check digests
-      REXML::XPath.each(sig_element, "//ds:Reference", DS_NAMESPACE) do | ref |          
-        
-        uri                   = ref.attributes.get_attribute("URI").value
+      REXML::XPath.each(sig_element, "//ds:Reference", DS_NAMESPACE) do | ref |
+        uri = ref.attributes.get_attribute("URI").value
         debug("Digest URI: #{uri}",logger)
-        parent = sig_element.parent
-        sig_element.remove
-        hashed_element        = REXML::XPath.first(doc, "//[@ID='#{uri[1,uri.size]}']")
+
+        hashed_element = REXML::XPath.first(doc, "//[@ID='#{uri[1,uri.size]}']")
         debug("Hashed element: #{hashed_element}",logger)
-        canoner               = XML::Util::XmlCanonicalizer.new(false, true)
-        begin
-          canon_hashed_element  = canoner.canonicalize(hashed_element)
-        rescue Exception => exception
-          debug("Exception raised trying to canonicalize the element. #{exception}, #{exception.backtrace}",logger)
-        end
 
+        canon_hashed_element = canonical_form(hashed_element)
         debug("Canonical hashed element: #{canon_hashed_element}",logger)
-        hash                  = Base64.encode64(Digest::SHA1.digest(canon_hashed_element)).chomp
-        digest_value          = REXML::XPath.first(ref, "//ds:DigestValue", DS_NAMESPACE).text
 
-        
-        valid_flag            = hash == digest_value
+        hash = Digest::SHA1.digest(canon_hashed_element)
+        digest_value = decode64_from_xpath(ref, "//ds:DigestValue")
         debug("calculated hash: #{hash}, expected_hash: #{digest_value}",logger)
-        debug("Digest check for #{uri} passed: #{valid_flag}",logger)
-        
-        return valid_flag if !valid_flag
+
+        return false unless hash == digest_value        
       end
-      return true
+      
+      true
     end
 
     def validate_signature(logger = nil)
       doc = self.deep_clone
       sig_element = sig_element(doc)
  
-      # verify signature
-      canoner                 = XML::Util::XmlCanonicalizer.new(false, true)
-      signed_info_element     = REXML::XPath.first(sig_element, "//ds:SignedInfo", DS_NAMESPACE)
-      canon_string            = canoner.canonicalize(signed_info_element)
+      signed_info_element = REXML::XPath.first(sig_element, "//ds:SignedInfo", DS_NAMESPACE)
+      canonical_form = canonical_form(signed_info_element)
 
-      base64_signature        = REXML::XPath.first(sig_element, "//ds:SignatureValue", DS_NAMESPACE).text
-      signature               = Base64.decode64(base64_signature)
-      
-      # get certificate object
-      cert_text               = Base64.decode64(base64_cert)
-      cert                    = OpenSSL::X509::Certificate.new(cert_text)
-      
-      valid_flag              = cert.public_key.verify(OpenSSL::Digest::SHA1.new, signature, canon_string)
-
-      return valid_flag
+      signature = decode64_from_xpath(sig_element, "//ds:SignatureValue")
+      cert.public_key.verify(OpenSSL::Digest::SHA1.new, signature, canonical_form)
     end
 
     private
 
+    def decode64_from_xpath(element, xpath)
+      xpath_result = REXML::XPath.first(element, xpath, DS_NAMESPACE)
+      Base64.decode64(xpath_result.text)
+    end
+
+    def cert(doc = self)
+      base64_cert = doc.elements["//ds:X509Certificate"].text
+      cert_text = Base64.decode64(base64_cert)
+      OpenSSL::X509::Certificate.new(cert_text)
+    end
+
+    def canonical_form(element)
+      canonicalizer = XML::Util::XmlCanonicalizer.new(false,true)
+      canonicalizer.canonicalize(element)
+    end
+
     def sig_element(document)
       REXML::XPath.first(document, "//ds:Signature", DS_NAMESPACE)
     end      
-
-    def base64_cert
-      self.elements["//ds:X509Certificate"].text
-    end
     
     def debug(message,logger)
       logger.debug(message) if logger
