@@ -8,6 +8,7 @@ module Onelogin::Saml
     attr_accessor :expected_transaction_id
     attr_writer :logger
     attr_writer :settings
+    attr_reader :errors
     
     def initialize(response, opts = {})
       @response = response
@@ -15,6 +16,7 @@ module Onelogin::Saml
       if opts.has_key?(:expected_transaction_id)
         @expected_transaction_id = opts[:expected_transaction_id]
       end
+      @errors = {}
     end
     
     def is_valid?
@@ -77,9 +79,15 @@ module Onelogin::Saml
     end
     
     def transaction_id_sync?
-      return false unless transaction_id == samlp_transaction_id
-      return true unless @expected_transaction_id
-      transaction_id == @expected_transaction_id
+      unless transaction_id == samlp_transaction_id
+        errors[:transaction_id] = "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo ids do not match"
+        return false
+      end
+      unless @expected_transaction_id.nil? || transaction_id == @expected_transaction_id 
+        errors[:transaction_id] = "saml:SubjectConfirmationData InResponseTo does not match expected_transaction_id"
+        return false
+      end
+      true
     end
 
     def within_time_window?
@@ -87,7 +95,15 @@ module Onelogin::Saml
       time_window_open = Time.parse(conditions_element.attribute("NotBefore").value)
       time_window_close = Time.parse(conditions_element.attribute("NotOnOrAfter").value)
       now = Time.now
-      now >= time_window_open && now < time_window_close
+      unless now < time_window_close
+        errors[:expiration_date] = "the saml:Conditions NotOnOrAfter time has expired"
+        return false
+      end
+      unless now >= time_window_open
+        errors[:ripeness_date] = "the saml:Conditions NotBefore time has not yet passed"
+        return false
+      end
+      true
     end
 
     def each_saml_attribute(element, selector, &blk)
