@@ -20,13 +20,14 @@ module Onelogin::Saml
     end
     
     def is_valid?
-      valid = true
-      valid &&= @document.validate_fingerprint(@settings.idp_cert_fingerprint, @logger) if @settings.idp_cert_fingerprint
-      valid &&= @document.validate_digests(@logger)
-      valid &&= @document.validate_signature(@logger)
-      valid &&= within_time_window?
-      valid &&= transaction_id_sync?
-      return valid
+      errors[:idp_cert_fingerprint] = ERROR_EXPECTED_FINGERPRINT unless @settings.idp_cert_fingerprint.nil? || @document.validate_fingerprint(@settings.idp_cert_fingerprint, @logger)
+      errors[:digest] = ERROR_DIGEST unless @document.validate_digests(@logger)
+      errors[:signature] = ERROR_SIGNATURE unless @document.validate_signature(@logger)
+      errors[:ripeness_date] = ERROR_RIPENESS unless after_ripeness_date?
+      errors[:expiration_date] = ERROR_EXPIRATION unless before_expiration_date?
+      errors[:transaction_id] = ERROR_CONSISTENT_ID unless transaction_id_internally_consistent?
+      errors[:transaction_id] = ERROR_EXPECTED_ID unless transaction_id_matches_expected?
+      return errors.empty?
     end
 
     alias :valid? :is_valid?
@@ -61,6 +62,14 @@ module Onelogin::Saml
 
     private
 
+    ERROR_SIGNATURE = "the ds:Signature value could not validate the assertion when checked against the cert"
+    ERROR_DIGEST = "the ds:DigestValue's digest did not match the calculated assertion's digest"
+    ERROR_EXPECTED_FINGERPRINT = "the ds:X509Certificate's hash did not match the provided idp_cert_fingerprint"
+    ERROR_EXPECTED_ID = "saml:SubjectConfirmationData InResponseTo does not match expected_transaction_id"
+    ERROR_CONSISTENT_ID = "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match"
+    ERROR_RIPENESS = "the saml:Conditions NotBefore time has not yet passed"
+    ERROR_EXPIRATION = "the saml:Conditions NotOnOrAfter time has expired"
+
     NAME_ID_PATH = "./saml:Subject/saml:NameID"
     PLAINTEXT_ASSERTION_PATH = "/samlp:Response/saml:Assertion"
     ENCRYPTED_RESPONSE_DATA_PATH = "/samlp:Response/saml:EncryptedAssertion/xenc:EncryptedData/"
@@ -78,32 +87,32 @@ module Onelogin::Saml
       samlp_response.attribute("InResponseTo").value
     end
     
-    def transaction_id_sync?
-      unless transaction_id == samlp_transaction_id
-        errors[:transaction_id] = "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo ids do not match"
-        return false
-      end
-      unless @expected_transaction_id.nil? || transaction_id == @expected_transaction_id 
-        errors[:transaction_id] = "saml:SubjectConfirmationData InResponseTo does not match expected_transaction_id"
-        return false
-      end
-      true
+    def transaction_id_internally_consistent?
+      transaction_id == samlp_transaction_id
     end
 
-    def within_time_window?
-      conditions_element = assertion_doc.elements["./saml:Conditions"]
-      time_window_open = Time.parse(conditions_element.attribute("NotBefore").value)
-      time_window_close = Time.parse(conditions_element.attribute("NotOnOrAfter").value)
-      now = Time.now
-      unless now < time_window_close
-        errors[:expiration_date] = "the saml:Conditions NotOnOrAfter time has expired"
-        return false
-      end
-      unless now >= time_window_open
-        errors[:ripeness_date] = "the saml:Conditions NotBefore time has not yet passed"
-        return false
-      end
-      true
+    def transaction_id_matches_expected?
+      @expected_transaction_id.nil? || transaction_id == @expected_transaction_id 
+    end
+
+    def conditions_element
+      assertion_doc.elements["./saml:Conditions"]
+    end
+    
+    def time_window_open
+      Time.parse(conditions_element.attribute("NotBefore").value)
+    end
+
+    def time_window_close
+      Time.parse(conditions_element.attribute("NotOnOrAfter").value)
+    end
+    
+    def before_expiration_date?
+      Time.now < time_window_close
+    end
+
+    def after_ripeness_date?
+      Time.now >= time_window_open
     end
 
     def each_saml_attribute(element, selector, &blk)

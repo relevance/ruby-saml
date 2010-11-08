@@ -22,6 +22,8 @@ describe Onelogin::Saml::Response do
 
   let(:busted_id_saml) { read_assertion_fixture("saml-assertion-with-busted-ids.xml") }
 
+  let(:broken_digest_saml) { read_assertion_fixture("saml-assertion-with-broken-digest.xml") }
+
   let(:settings) do
     settings = Onelogin::Saml::Settings.new
     
@@ -48,6 +50,10 @@ describe Onelogin::Saml::Response do
 
   let(:busted_id_response) do
     response_for_saml(busted_id_saml)
+  end
+
+  let (:broken_digest_response) do
+    response_for_saml(broken_digest_saml)
   end
 
   let (:response_time_freeze) do
@@ -177,7 +183,7 @@ describe Onelogin::Saml::Response do
       Timecop.freeze(response_time_freeze) do
         busted_id_response.valid?.should == false
         busted_id_response.errors.should include(:transaction_id)
-        busted_id_response.errors[:transaction_id].should == "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo ids do not match"
+        busted_id_response.errors[:transaction_id].should == "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match"
       end
     end
 
@@ -203,6 +209,32 @@ describe Onelogin::Saml::Response do
         response.valid?.should == false
         response.errors.should include(:ripeness_date)
         response.errors[:ripeness_date].should == "the saml:Conditions NotBefore time has not yet passed"
+      end
+    end
+
+    it "should log an error when the signing cert's hash does not match the fingerprint" do
+      Timecop.freeze(response_time_freeze) do
+        settings.idp_cert_fingerprint = "brokenidpcertfingerprint"
+        response.settings = settings
+        response.valid?.should == false
+        response.errors.should include(:idp_cert_fingerprint)
+        response.errors[:idp_cert_fingerprint].should == "the ds:X509Certificate's hash did not match the provided idp_cert_fingerprint"
+      end
+    end
+
+    it "should log an error when the calculated and specified digest value do not match" do
+      Timecop.freeze(response_time_freeze) do
+        broken_digest_response.valid?.should == false
+        broken_digest_response.errors.should include(:digest)
+        broken_digest_response.errors[:digest].should == "the ds:DigestValue's digest did not match the calculated assertion's digest"
+      end
+    end
+
+    it "should log an error when the specified signature does not match" do
+      Timecop.freeze(response_time_freeze) do
+        broken_digest_response.valid?.should == false
+        broken_digest_response.errors.should include(:signature)
+        broken_digest_response.errors[:signature].should == "the ds:Signature value could not validate the assertion when checked against the cert"
       end
     end
 
