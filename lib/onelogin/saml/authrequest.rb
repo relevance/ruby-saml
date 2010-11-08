@@ -22,7 +22,7 @@ module Onelogin::Saml
         "<saml:AuthnContextClassRef xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext>\n" +
         "</samlp:AuthnRequest>"
 
-      logger.debug("Raw SAML request: #{request}") unless @logger.nil?
+      @logger.debug("Raw SAML request: #{request}") unless @logger.nil?
       
       deflated_request  = Zlib::Deflate.deflate(request, 9)[2..-5]
       base64_request    = Base64.encode64(deflated_request)  
