@@ -8,6 +8,7 @@ module Onelogin::Saml
     attr_accessor :expected_transaction_id
     attr_writer :logger
     attr_writer :settings
+    attr_reader :errors
     
     def initialize(response, opts = {})
       @response = response
@@ -15,16 +16,18 @@ module Onelogin::Saml
       if opts.has_key?(:expected_transaction_id)
         @expected_transaction_id = opts[:expected_transaction_id]
       end
+      @errors = {}
     end
     
     def is_valid?
-      valid = true
-      valid &&= @document.validate_fingerprint(@settings.idp_cert_fingerprint, @logger) if @settings.idp_cert_fingerprint
-      valid &&= @document.validate_digests(@logger)
-      valid &&= @document.validate_signature(@logger)
-      valid &&= within_time_window?
-      valid &&= transaction_id_sync?
-      return valid
+      errors[:idp_cert_fingerprint] = ErrorMessages[:expected_fingerprint] unless @settings.idp_cert_fingerprint.nil? || @document.validate_fingerprint(@settings.idp_cert_fingerprint, @logger)
+      errors[:digest]               = ErrorMessages[:digest] unless @document.validate_digests(@logger)
+      errors[:signature]            = ErrorMessages[:signature] unless @document.validate_signature(@logger)
+      errors[:ripeness_date]        = ErrorMessages[:ripeness] unless after_ripeness_date?
+      errors[:expiration_date]      = ErrorMessages[:expiration] unless before_expiration_date?
+      errors[:transaction_id]       = ErrorMessages[:consistent_id] unless transaction_id_internally_consistent?
+      errors[:transaction_id]       = ErrorMessages[:expected_id] unless transaction_id_matches_expected?
+      return errors.empty?
     end
 
     alias :valid? :is_valid?
@@ -58,6 +61,16 @@ module Onelogin::Saml
     end
 
     private
+    
+    ErrorMessages = {
+      :signature => "the ds:Signature value could not validate the assertion when checked against the cert",
+      :digest => "the ds:DigestValue's digest did not match the calculated assertion's digest",
+      :expected_fingerprint => "the ds:X509Certificate's hash did not match the provided idp_cert_fingerprint",
+      :expected_id => "saml:SubjectConfirmationData InResponseTo does not match expected_transaction_id",
+      :consistent_id => "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match",
+      :ripeness => "the saml:Conditions NotBefore time has not yet passed",
+      :expiration => "the saml:Conditions NotOnOrAfter time has expired",
+    }
 
     NAME_ID_PATH = "./saml:Subject/saml:NameID"
     PLAINTEXT_ASSERTION_PATH = "/samlp:Response/saml:Assertion"
@@ -76,18 +89,32 @@ module Onelogin::Saml
       samlp_response.attribute("InResponseTo").value
     end
     
-    def transaction_id_sync?
-      return false unless transaction_id == samlp_transaction_id
-      return true unless @expected_transaction_id
-      transaction_id == @expected_transaction_id
+    def transaction_id_internally_consistent?
+      transaction_id == samlp_transaction_id
     end
 
-    def within_time_window?
-      conditions_element = assertion_doc.elements["./saml:Conditions"]
-      time_window_open = Time.parse(conditions_element.attribute("NotBefore").value)
-      time_window_close = Time.parse(conditions_element.attribute("NotOnOrAfter").value)
-      now = Time.now
-      now >= time_window_open && now < time_window_close
+    def transaction_id_matches_expected?
+      @expected_transaction_id.nil? || transaction_id == @expected_transaction_id 
+    end
+
+    def conditions_element
+      assertion_doc.elements["./saml:Conditions"]
+    end
+    
+    def time_window_open
+      Time.parse(conditions_element.attribute("NotBefore").value)
+    end
+
+    def time_window_close
+      Time.parse(conditions_element.attribute("NotOnOrAfter").value)
+    end
+    
+    def before_expiration_date?
+      Time.now < time_window_close
+    end
+
+    def after_ripeness_date?
+      Time.now >= time_window_open
     end
 
     def each_saml_attribute(element, selector, &blk)

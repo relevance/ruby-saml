@@ -5,11 +5,24 @@ require 'time'
 require 'timecop'
 
 describe Onelogin::Saml::Response do
-  let(:raw_saml) { File.open(File.dirname(__FILE__) + '/../../fixtures/saml-assertion-with-2-attributes.xml').read }
 
-  let(:encrypted_saml) {File.open(File.dirname(__FILE__) + '/../../fixtures/saml-encrypted-assertion.xml').read }
+  def read_assertion_fixture(name)
+    File.open(File.dirname(__FILE__) + "/../../fixtures/#{name}").read
+  end
 
-  let(:busted_id_saml) {File.open(File.dirname(__FILE__) + '/../../fixtures/saml-assertion-with-busted-ids.xml').read }
+  def response_for_saml(saml)
+    response = Onelogin::Saml::Response.new(Base64.encode64(saml))
+    response.settings = settings
+    response
+  end
+  
+  let(:raw_saml) { read_assertion_fixture("saml-assertion-with-2-attributes.xml") }
+
+  let(:encrypted_saml) { read_assertion_fixture("saml-encrypted-assertion.xml") }
+
+  let(:busted_id_saml) { read_assertion_fixture("saml-assertion-with-busted-ids.xml") }
+
+  let(:broken_digest_saml) { read_assertion_fixture("saml-assertion-with-broken-digest.xml") }
 
   let(:settings) do
     settings = Onelogin::Saml::Settings.new
@@ -28,21 +41,19 @@ describe Onelogin::Saml::Response do
   end
 
   let(:response) do
-    response = Onelogin::Saml::Response.new(Base64.encode64(raw_saml))
-    response.settings = settings
-    response
+    response_for_saml(raw_saml)
   end
 
   let(:encrypted_response) do
-    response = Onelogin::Saml::Response.new(Base64.encode64(encrypted_saml))
-    response.settings = settings
-    response
+    response_for_saml(encrypted_saml)
   end
 
   let(:busted_id_response) do
-    response = Onelogin::Saml::Response.new(Base64.encode64(busted_id_saml))
-    response.settings = settings
-    response
+    response_for_saml(busted_id_saml)
+  end
+
+  let (:broken_digest_response) do
+    response_for_saml(broken_digest_saml)
   end
 
   let (:response_time_freeze) do
@@ -159,5 +170,74 @@ describe Onelogin::Saml::Response do
     end
   end
 
+  describe "errors" do
+
+    it "should return an empty hash if validation encountered no errors" do
+      Timecop.freeze(response_time_freeze) do
+        response.valid?.should == true
+        response.errors.should == {}
+      end
+    end
+
+    it "should log an error when the document has inconsistent InResponseTo ids" do
+      Timecop.freeze(response_time_freeze) do
+        busted_id_response.valid?.should == false
+        busted_id_response.errors.should include(:transaction_id)
+        busted_id_response.errors[:transaction_id].should == "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match"
+      end
+    end
+
+    it "should log an error when the actual and expected transaction_ids don't match" do
+      Timecop.freeze(response_time_freeze) do
+        response.expected_transaction_id = "quux-zot-bar-baz-foo"
+        response.valid?.should == false
+        response.errors.should include(:transaction_id)
+        response.errors[:transaction_id].should == "saml:SubjectConfirmationData InResponseTo does not match expected_transaction_id"
+      end
+    end
+
+    it "should log an error when the document is after it's expiration date" do
+      Timecop.freeze(Time.parse("October 28th, 2010 1:46pm UTC")) do
+        response.valid?.should == false
+        response.errors.should include(:expiration_date)
+        response.errors[:expiration_date].should == "the saml:Conditions NotOnOrAfter time has expired"
+      end
+    end
+
+    it "should log an error when the document is before it's ripeness date" do
+      Timecop.freeze(Time.parse("October 28th, 2010 1:24pm UTC")) do
+        response.valid?.should == false
+        response.errors.should include(:ripeness_date)
+        response.errors[:ripeness_date].should == "the saml:Conditions NotBefore time has not yet passed"
+      end
+    end
+
+    it "should log an error when the signing cert's hash does not match the fingerprint" do
+      Timecop.freeze(response_time_freeze) do
+        settings.idp_cert_fingerprint = "brokenidpcertfingerprint"
+        response.settings = settings
+        response.valid?.should == false
+        response.errors.should include(:idp_cert_fingerprint)
+        response.errors[:idp_cert_fingerprint].should == "the ds:X509Certificate's hash did not match the provided idp_cert_fingerprint"
+      end
+    end
+
+    it "should log an error when the calculated and specified digest value do not match" do
+      Timecop.freeze(response_time_freeze) do
+        broken_digest_response.valid?.should == false
+        broken_digest_response.errors.should include(:digest)
+        broken_digest_response.errors[:digest].should == "the ds:DigestValue's digest did not match the calculated assertion's digest"
+      end
+    end
+
+    it "should log an error when the specified signature does not match" do
+      Timecop.freeze(response_time_freeze) do
+        broken_digest_response.valid?.should == false
+        broken_digest_response.errors.should include(:signature)
+        broken_digest_response.errors[:signature].should == "the ds:Signature value could not validate the assertion when checked against the cert"
+      end
+    end
+
+  end
   
 end
