@@ -20,13 +20,13 @@ module Onelogin::Saml
     end
     
     def is_valid?
-      errors[:idp_cert_fingerprint] = ERROR_EXPECTED_FINGERPRINT unless @settings.idp_cert_fingerprint.nil? || @document.validate_fingerprint(@settings.idp_cert_fingerprint, @logger)
-      errors[:digest] = ERROR_DIGEST unless @document.validate_digests(@logger)
-      errors[:signature] = ERROR_SIGNATURE unless @document.validate_signature(@logger)
-      errors[:ripeness_date] = ERROR_RIPENESS unless after_ripeness_date?
-      errors[:expiration_date] = ERROR_EXPIRATION unless before_expiration_date?
-      errors[:transaction_id] = ERROR_CONSISTENT_ID unless transaction_id_internally_consistent?
-      errors[:transaction_id] = ERROR_EXPECTED_ID unless transaction_id_matches_expected?
+      errors[:idp_cert_fingerprint] = ErrorMessages[:expected_fingerprint] unless @settings.idp_cert_fingerprint.nil? || @document.validate_fingerprint(@settings.idp_cert_fingerprint, @logger)
+      errors[:digest]               = ErrorMessages[:digest] unless @document.validate_digests(@logger)
+      errors[:signature]            = ErrorMessages[:signature] unless @document.validate_signature(@logger)
+      errors[:ripeness_date]        = ErrorMessages[:ripeness] unless after_ripeness_date?
+      errors[:expiration_date]      = ErrorMessages[:expiration] unless before_expiration_date?
+      errors[:transaction_id]       = ErrorMessages[:consistent_id] unless transaction_id_internally_consistent?
+      errors[:transaction_id]       = ErrorMessages[:expected_id] unless transaction_id_matches_expected?
       return errors.empty?
     end
 
@@ -62,13 +62,15 @@ module Onelogin::Saml
 
     private
     
-    ERROR_SIGNATURE = "the ds:Signature value could not validate the assertion when checked against the cert"
-    ERROR_DIGEST = "the ds:DigestValue's digest did not match the calculated assertion's digest"
-    ERROR_EXPECTED_FINGERPRINT = "the ds:X509Certificate's hash did not match the provided idp_cert_fingerprint"
-    ERROR_EXPECTED_ID = "saml:SubjectConfirmationData InResponseTo does not match expected_transaction_id"
-    ERROR_CONSISTENT_ID = "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match"
-    ERROR_RIPENESS = "the saml:Conditions NotBefore time has not yet passed"
-    ERROR_EXPIRATION = "the saml:Conditions NotOnOrAfter time has expired"
+    ErrorMessages = {
+      :signature => "the ds:Signature value could not validate the assertion when checked against the cert",
+      :digest => "the ds:DigestValue's digest did not match the calculated assertion's digest",
+      :expected_fingerprint => "the ds:X509Certificate's hash did not match the provided idp_cert_fingerprint",
+      :expected_id => "saml:SubjectConfirmationData InResponseTo does not match expected_transaction_id",
+      :consistent_id => "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match",
+      :ripeness => "the saml:Conditions NotBefore time has not yet passed",
+      :expiration => "the saml:Conditions NotOnOrAfter time has expired",
+    }
 
     NAME_ID_PATH = "./saml:Subject/saml:NameID"
     PLAINTEXT_ASSERTION_PATH = "/samlp:Response/saml:Assertion"
