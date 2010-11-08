@@ -61,7 +61,7 @@ module Onelogin::Saml
     end
 
     private
-
+    
     ERROR_SIGNATURE = "the ds:Signature value could not validate the assertion when checked against the cert"
     ERROR_DIGEST = "the ds:DigestValue's digest did not match the calculated assertion's digest"
     ERROR_EXPECTED_FINGERPRINT = "the ds:X509Certificate's hash did not match the provided idp_cert_fingerprint"
