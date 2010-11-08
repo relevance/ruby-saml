@@ -5,6 +5,7 @@ require "cgi"
 module Onelogin::Saml
   class Authrequest
     attr_reader :transaction_id
+    attr_writer :logger
 
     def initialize
       @transaction_id = UUID.new.generate
@@ -21,7 +22,9 @@ module Onelogin::Saml
         "<saml:AuthnContextClassRef xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext>\n" +
         "</samlp:AuthnRequest>"
 
-      deflated_request  = Zlib::Deflate.deflate(request, 9)[2..-5]     
+      logger.debug("Raw SAML request: #{request}") unless @logger.nil?
+      
+      deflated_request  = Zlib::Deflate.deflate(request, 9)[2..-5]
       base64_request    = Base64.encode64(deflated_request)  
       params["SAMLRequest"] = base64_request
       query_string = params.map {|key, value| "#{key}=#{CGI.escape(value)}"}.join("&")
