@@ -182,8 +182,8 @@ describe Onelogin::Saml::Response do
     it "should log an error when the document has inconsistent InResponseTo ids" do
       Timecop.freeze(response_time_freeze) do
         busted_id_response.valid?.should == false
-        busted_id_response.errors.should include(:transaction_id)
-        busted_id_response.errors[:transaction_id].should == "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match"
+        busted_id_response.errors.should include(:base)
+        busted_id_response.errors[:base].should == "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match"
       end
     end
 

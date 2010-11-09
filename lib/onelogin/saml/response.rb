@@ -25,8 +25,8 @@ module Onelogin::Saml
       errors[:signature]            = ErrorMessages[:signature] unless @document.validate_signature(@logger)
       errors[:ripeness_date]        = ErrorMessages[:ripeness] unless after_ripeness_date?
       errors[:expiration_date]      = ErrorMessages[:expiration] unless before_expiration_date?
-      errors[:transaction_id]       = ErrorMessages[:consistent_id] unless transaction_id_internally_consistent?
-      errors[:transaction_id]       = ErrorMessages[:expected_id] unless transaction_id_matches_expected?
+      errors[:base]  = ErrorMessages[:inconsistent_id] unless transaction_id_internally_consistent?
+      errors[:transaction_id] = ErrorMessages[:expected_id] unless transaction_id_matches_expected?
       return errors.empty?
     end
 
@@ -67,7 +67,7 @@ module Onelogin::Saml
       :digest => "the ds:DigestValue's digest did not match the calculated assertion's digest",
       :expected_fingerprint => "the ds:X509Certificate's hash did not match the provided idp_cert_fingerprint",
       :expected_id => "saml:SubjectConfirmationData InResponseTo does not match expected_transaction_id",
-      :consistent_id => "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match",
+      :inconsistent_id => "samlp:AuthnRequest and saml:SubjectConfirmationData InResponseTo IDs do not match",
       :ripeness => "the saml:Conditions NotBefore time has not yet passed",
       :expiration => "the saml:Conditions NotOnOrAfter time has expired",
     }
