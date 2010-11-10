@@ -35,6 +35,16 @@ Once the user returns from the IDP with a SAML response, enforce transaction ID 
 Once expected_transaction_id is set on a Onelogin::Saml::Response, all calls to valid? will
 check the response's ID against the provided id.
 
+== Rake tasks
+
+To access rake tasks provided by ruby-saml, include the following in your Rakefile:
+
+   require 'onelogin/saml/tasks'
+
+ruby-saml includes the following rake tasks:
+
+* saml:gen_cert - Generate a self-signed certificate and private key pair, saving them to ./config/saml_certs
+
 == Note on Patches/Pull Requests
  
 * Fork the project.
