@@ -10,8 +10,18 @@ module Onelogin::Saml
     attr_writer :idp_sso_target_url
     attr_writer :idp_cert_fingerprint
     attr_writer :name_identifier_format
-    attr_accessor :private_key
+    attr_reader :private_key
     attr_accessor :private_key_password
+
+    def private_key=(keyfile)
+      if keyfile.respond_to?(:read)
+        @private_key = keyfile.read
+      elsif File.exists?(keyfile)
+        File.open(keyfile) { |file| @private_key = file.read }
+      else
+        @private_key = keyfile
+      end
+    end
 
     def idp_metadata=(metadata)
       if metadata.respond_to?(:read)

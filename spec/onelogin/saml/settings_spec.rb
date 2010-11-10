@@ -41,6 +41,7 @@ describe Onelogin::Saml::Settings do
 
     it "overrides name_identifier_format with the explicitly set value if set" do
       settings.name_identifier_format = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+      settings.sp_metadata = File.dirname(__FILE__) + "/../../fixtures/sp.xml"
       settings.name_identifier_format.should == "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
     end
         
@@ -66,6 +67,7 @@ describe Onelogin::Saml::Settings do
     
     it "overrides name_identifier_format with the explicitly set value if set" do
       settings.name_identifier_format = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+      settings.sp_metadata = File.dirname(__FILE__) + "/../../fixtures/sp.yaml"
       settings.name_identifier_format.should == "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
     end
 
