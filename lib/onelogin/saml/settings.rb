@@ -33,6 +33,8 @@ module Onelogin::Saml
       end
     end
 
+    alias :identity_provider_metadata= :idp_metadata=
+
     def sp_metadata=(metadata)
       if metadata.respond_to?(:read)
         @sp_metadata = metadata.read
@@ -43,6 +45,8 @@ module Onelogin::Saml
       end
     end
 
+    alias :service_provider_metadata= :sp_metadata=
+    
     def sp_yaml=(yaml)
       if yaml.respond_to?(:read)
         @sp_yaml = yaml.read
@@ -52,6 +56,8 @@ module Onelogin::Saml
         @sp_yaml = yaml
       end
     end
+
+    alias :service_provider_yaml= :sp_yaml=
 
     def idp_sso_target_url
       @idp_sso_target_url || idp_sso_target_url_from_metadata
