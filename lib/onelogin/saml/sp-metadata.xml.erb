@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <EntityDescriptor entityID="<%= issuer %>" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
   <SPSSODescriptor AuthnRequestsSigned="true" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-    <% name_id_format.each do |format| %>
-      <NameIDFormat><%= format %></NameIDFormat>
-    <% end %>
+% if cert_text
+    <KeyDescriptor use="signing">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <X509Data>
+          <X509Certificate>
+            <%= cert_text.chomp.gsub(/\n/,"\n            ") %>
+          </X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </KeyDescriptor>
+    <KeyDescriptor use="encryption">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <X509Data>
+          <X509Certificate>
+            <%= cert_text.chomp.gsub(/\n/,"\n            ") %>
+          </X509Certificate>
+        </X509Data>
+      </KeyInfo>
+      <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc">
+        <KeySize xmlns="http://www.w3.org/2001/04/xmlenc#">128</KeySize>
+      </EncryptionMethod> 
+    </KeyDescriptor>
+% end
+% name_id_format.each do |format|
+    <NameIDFormat><%= format %></NameIDFormat>
+% end
     <AssertionConsumerService index="0" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="<%= consumer_url %>"/>
   </SPSSODescriptor>
 </EntityDescriptor>
