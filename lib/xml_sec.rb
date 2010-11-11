@@ -68,7 +68,12 @@ module XMLSecurity
 
         hash = Digest::SHA1.digest(canon_hashed_element)
         digest_value = decode64_from_xpath(ref, "//ds:DigestValue")
-        debug("calculated hash: #{hash}, expected_hash: #{digest_value}",logger)
+
+        if hash == digest_value
+          debug("calculated hash matched", logger)
+        else
+          debug("calculated hash did not match; has was #{hash}, expected #{digest_value}",logger)
+        end
 
         return false unless hash == digest_value        
       end
