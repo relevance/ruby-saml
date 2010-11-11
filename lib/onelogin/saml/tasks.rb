@@ -37,7 +37,7 @@ module Onelogin
         end
       end
 
-      def incomplete_sp_yaml?(issuer, consumer_url, name_id_format)
+      def incomplete_sp_yaml?(issuer, consumer_url, name_id_format, parsed_yaml)
         unless issuer && consumer_url && name_id_format
           needed_keys = ["issuer", "consumer_url", "name_id_format"]
           puts "sp.yml does not include #{(needed_keys - parsed_yaml.keys).join(", ")}, correct before generating metadata"
@@ -59,7 +59,7 @@ module Onelogin
         issuer = parsed_yaml["issuer"]
         consumer_url = parsed_yaml["consumer_url"]
         name_id_format = parsed_yaml["name_id_format"]
-        return if incomplete_sp_yaml?(issuer, consumer_url, name_id_format)
+        return if incomplete_sp_yaml?(issuer, consumer_url, name_id_format, parsed_yaml)
         cert_file = parsed_yaml["cert_file"]
         if cert_file
           cert_text = cert_from_filename(cert_file)
