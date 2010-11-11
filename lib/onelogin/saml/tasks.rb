@@ -41,7 +41,7 @@ module Onelogin
         unless issuer && consumer_url && name_id_format
           needed_keys = ["issuer", "consumer_url", "name_id_format"]
           puts "sp.yml does not include #{(needed_keys - parsed_yaml.keys).join(", ")}, correct before generating metadata"
-          return
+          return true
         end
       end
 
