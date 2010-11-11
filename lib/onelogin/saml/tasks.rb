@@ -42,7 +42,7 @@ module Onelogin
         name_id_format = parsed_yaml["name_id_format"]
         unless issuer && consumer_url && name_id_format
           needed_keys = ["issuer", "consumer_url", "name_id_format"]
-          puts "sp.yml does not include #{needed_keys - parsed_yaml.keys}, correct before generating metadata"
+          puts "sp.yml does not include #{(needed_keys - parsed_yaml.keys).join(", ")}, correct before generating metadata"
           return
         end
         cert_file = parsed_yaml["cert_file"]
