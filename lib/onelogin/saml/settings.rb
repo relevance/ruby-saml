@@ -10,8 +10,12 @@ module Onelogin::Saml
     attr_writer :idp_sso_target_url
     attr_writer :idp_cert_fingerprint
     attr_writer :name_identifier_format
-    attr_reader :private_key
-    attr_accessor :private_key_password
+    attr_writer :private_key_password
+
+    def private_key
+      private_key = private_key_path_from_yaml unless @private_key
+      @private_key
+    end
 
     def private_key=(keyfile)
       if keyfile.respond_to?(:read)
@@ -67,6 +71,10 @@ module Onelogin::Saml
       @idp_cert_fingerprint || idp_cert_fingerprint_from_metadata
     end
 
+    def private_key_password
+      @private_key_password || private_key_password_from_yaml
+    end
+
     def issuer
       @issuer || issuer_from_config
     end
@@ -93,6 +101,10 @@ module Onelogin::Saml
 
     def sp_metadata_doc
       @sp_metadata_doc ||= REXML::Document.new(@sp_metadata)
+    end
+    
+    def private_key_path_from_yaml
+      parsed_sp_yaml["private_key"]
     end
 
     def parsed_sp_yaml
@@ -144,6 +156,10 @@ module Onelogin::Saml
       elsif @sp_yaml
         issuer_from_yaml
       end
+    end
+
+    def private_key_password_from_yaml
+      parsed_sp_yaml["private_key_password"]
     end
 
     def issuer_from_yaml
