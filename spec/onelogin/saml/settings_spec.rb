@@ -48,6 +48,8 @@ describe Onelogin::Saml::Settings do
   end
 
   describe "sp_yaml" do
+    let(:private_key_path) { File.dirname(__FILE__) + "/../../fixtures/ca.key" }
+    let(:private_key_text) { File.open(private_key_path) {|file| file.read }}
 
     before(:each) do
       settings.sp_yaml = File.dirname(__FILE__) + "/../../fixtures/sp.yml"
@@ -66,11 +68,18 @@ describe Onelogin::Saml::Settings do
     end
     
     it "overrides name_identifier_format with the explicitly set value if set" do
-      settings.name_identifier_format = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-      settings.sp_metadata = File.dirname(__FILE__) + "/../../fixtures/sp.yml"
-      settings.name_identifier_format.should == "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+      settings.name_identifier_format = "some-explicit-value"
+      settings.sp_metadata = File.dirname(__FILE__) + "/../../fixtures/sp.xml"
+      settings.name_identifier_format.should == "some-explicit-value"
     end
 
+    it "pulls private_key_password from the sp yaml if unset" do
+      settings.private_key_password.should == "password_from_sp_yml"
+    end
+
+    it "pulls private_key from the sp yaml if unset" do
+      settings.private_key.should == private_key_text
+    end
   end
   
-end 
+end

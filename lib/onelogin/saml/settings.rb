@@ -13,7 +13,7 @@ module Onelogin::Saml
     attr_writer :private_key_password
 
     def private_key
-      private_key = private_key_path_from_yaml unless @private_key
+      self.private_key = private_key_path_from_yaml unless @private_key
       @private_key
     end
 

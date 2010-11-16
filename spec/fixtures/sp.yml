@@ -3,3 +3,5 @@ consumer_url: http://sp.example.com/session
 name_id_format:
   - urn:oasis:names:tc:SAML:2.0:nameid-format:transient
   - urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+private_key: ./spec/fixtures/ca.key
+private_key_password: password_from_sp_yml
