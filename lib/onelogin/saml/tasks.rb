@@ -14,7 +14,7 @@ module Onelogin
             gen_cert
           end
 
-          desc "Generate a Service Provider metadata file from ./config/sp.yaml and ./config/saml_certs/saml.cer"
+          desc "Generate a Service Provider metadata file from ./config/sp.yml and ./config/saml_certs/saml.cer"
           task :gen_sp_metadata do
             gen_sp_metadata
           end
