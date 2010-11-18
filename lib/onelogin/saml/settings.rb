@@ -104,7 +104,7 @@ module Onelogin::Saml
     end
     
     def private_key_path_from_yaml
-      parsed_sp_yaml["private_key"]
+      parsed_sp_yaml["private_key_file"]
     end
 
     def parsed_sp_yaml

@@ -54,6 +54,8 @@ An example sp.yml to get you started:
      - urn:oasis:names:tc:SAML:2.0:nameid-format:transient
      - urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
    cert_file: ./config/saml_certs/saml.cer
+   private_key_file: ./config/saml_certs/saml.key
+   private_key_password: passphrase_for_saml_key
 
 == Note on Patches/Pull Requests
  
