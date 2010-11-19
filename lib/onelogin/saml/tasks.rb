@@ -70,8 +70,14 @@ module Onelogin
       end
       
       def gen_cert
+        unless missing_sp_yaml?
+          sp_yaml = File.open("./config/sp.yml").read
+          parsed_yaml = YAML::load(sp_yaml)
+          issuer = parsed_yaml["issuer"]
+        end
+        issuer ||= "service-provider"
         mkdir_p './config/saml_certs'
-        system "openssl req -x509 -days 1001 -newkey rsa:1024 -nodes -keyout ./config/saml_certs/saml.key -out ./config/saml_certs/saml.cer -subj '/C=US'"
+        system "openssl req -x509 -days 1001 -newkey rsa:1024 -nodes -keyout ./config/saml_certs/saml.key -out ./config/saml_certs/saml.cer -subj '/CN=#{issuer}'"
         # To specify certificate fields on the command line: "-subj '/C=US/ST=state/L=city/O=org name/OU=dept name/CN=common name/emailAddress=email'"
       end
       
