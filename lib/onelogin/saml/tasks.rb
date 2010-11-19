@@ -49,7 +49,7 @@ module Onelogin
         name_id_format = name_id_format.instance_of?(Array) ? name_id_format : [name_id_format]
         template = File.open(File.expand_path("../sp-metadata.xml.erb",__FILE__)).read
         erb = ERB.new(template,0,"%<>>")
-        erb.result(binding)        
+        erb.result(binding)
       end
 
       def gen_sp_metadata
@@ -71,8 +71,8 @@ module Onelogin
       
       def gen_cert
         mkdir_p './config/saml_certs'
-        system 'openssl genrsa -des3 -out ./config/saml_certs/saml.key 1024'
-        system 'openssl req -new -x509 -days 1001 -key ./config/saml_certs/saml.key -out ./config/saml_certs/saml.cer'
+        system "openssl req -x509 -days 1001 -newkey rsa:1024 -nodes -keyout ./config/saml_certs/saml.key -out ./config/saml_certs/saml.cer -subj '/C=US'"
+        # To specify certificate fields on the command line: "-subj '/C=US/ST=state/L=city/O=org name/OU=dept name/CN=common name/emailAddress=email'"
       end
       
     end
