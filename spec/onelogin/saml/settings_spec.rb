@@ -81,5 +81,10 @@ describe Onelogin::Saml::Settings do
       settings.private_key.should == private_key_text
     end
   end
-  
+
+  describe "private_key_password" do
+    it "returns nil if neither sp_yaml nor private_key_password are specified" do
+      settings.private_key_password.should == nil
+    end
+  end
 end

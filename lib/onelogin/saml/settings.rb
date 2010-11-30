@@ -55,7 +55,7 @@ module Onelogin::Saml
       if yaml.respond_to?(:read)
         @sp_yaml = yaml.read
       elsif File.exists?(yaml)
-        File.open(yaml) { |file| @sp_yaml = file.read}
+        File.open(yaml) { |file| @sp_yaml = file.read }
       else
         @sp_yaml = yaml
       end
@@ -108,7 +108,7 @@ module Onelogin::Saml
     end
 
     def parsed_sp_yaml
-      @parsed_sp_yaml ||= YAML::load(@sp_yaml)
+      @parsed_sp_yaml ||= YAML::load(@sp_yaml || "") || {}
     end
 
     def name_identifier_format_from_config
