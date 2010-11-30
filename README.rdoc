@@ -43,22 +43,22 @@ To access rake tasks provided by ruby-saml, include the following in your Rakefi
 
 ruby-saml includes the following rake tasks:
 
-* saml:gen_cert - Generate a self-signed certificate and private key pair, saving them to ./config/saml_certs
-* saml:gen_sp_metadata - Generate a service provider metadata file based on config information in ./config/sp.yml
+* saml:gen_cert - Generate a self-signed certificate and private key pair, saving them to ./config/saml/sp.{cer,key}
+* saml:gen_sp_metadata - Generate a service provider metadata file based on config information in ./config/saml/sp.yml
 
-An example sp.yml to get you started: 
+An example sp.yml to get you started:
 
    issuer: saml-example
    consumer_url: http://saml.example.com/authenticate
    name_id_format:
      - urn:oasis:names:tc:SAML:2.0:nameid-format:transient
      - urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-   cert_file: ./config/saml_certs/saml.cer
-   private_key_file: ./config/saml_certs/saml.key
-   private_key_password: passphrase_for_saml_key
+   cert_file: ./config/saml/sp.cer
+   private_key_file: ./config/saml/sp.key
+   private_key_password: passphrase_for_sp_key
 
 == Note on Patches/Pull Requests
- 
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a

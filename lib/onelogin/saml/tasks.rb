@@ -14,7 +14,7 @@ module Onelogin
             gen_cert
           end
 
-          desc "Generate a Service Provider metadata file from ./config/sp.yml and ./config/saml_certs/saml.cer"
+          desc "Generate a Service Provider metadata file from ./config/saml/sp.yml"
           task :gen_sp_metadata do
             gen_sp_metadata
           end
@@ -31,8 +31,8 @@ module Onelogin
       end
 
       def missing_sp_yaml?
-        unless File.exists?("./config/sp.yml")
-          puts "No such file: ./config/sp.yml. Exiting."
+        unless File.exists?("./config/saml/sp.yml")
+          puts "No such file: ./config/saml/sp.yml. Exiting."
           return true
         end
       end
@@ -54,7 +54,7 @@ module Onelogin
 
       def gen_sp_metadata
         return if missing_sp_yaml?
-        sp_yaml = File.open("./config/sp.yml").read
+        sp_yaml = File.open("./config/saml/sp.yml").read
         parsed_yaml = YAML::load(sp_yaml)
         issuer = parsed_yaml["issuer"]
         consumer_url = parsed_yaml["consumer_url"]
@@ -65,19 +65,19 @@ module Onelogin
           cert_text = cert_from_filename(cert_file)
         end
         output = render_sp_metadata(issuer, consumer_url, name_id_format, cert_text)
-        File.open("./config/sp.xml","w") { |f| f.write output }
-        puts "Wrote ./config/sp.xml"
+        File.open("./config/saml/sp.xml","w") { |f| f.write output }
+        puts "Wrote ./config/saml/sp.xml"
       end
       
       def gen_cert
         unless missing_sp_yaml?
-          sp_yaml = File.open("./config/sp.yml").read
+          sp_yaml = File.open("./config/saml/sp.yml").read
           parsed_yaml = YAML::load(sp_yaml)
           issuer = parsed_yaml["issuer"]
         end
         issuer ||= "service-provider"
-        mkdir_p './config/saml_certs'
-        system "openssl req -x509 -days 1001 -newkey rsa:1024 -nodes -keyout ./config/saml_certs/saml.key -out ./config/saml_certs/saml.cer -subj '/CN=#{issuer}'"
+        mkdir_p './config/saml'
+        system "openssl req -x509 -days 1001 -newkey rsa:1024 -nodes -keyout ./config/saml/sp.key -out ./config/saml/sp.cer -subj '/CN=#{issuer}'"
         # To specify certificate fields on the command line: "-subj '/C=US/ST=state/L=city/O=org name/OU=dept name/CN=common name/emailAddress=email'"
       end
       
