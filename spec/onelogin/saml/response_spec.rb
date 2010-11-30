@@ -32,7 +32,7 @@ describe Onelogin::Saml::Response do
     settings.idp_sso_target_url               = "http://dev.awesomesauce.com:8080/opensso/SSOPOST/metaAlias/idp"
     settings.idp_cert_fingerprint             = "def18dbed547cdf3d52b627f41637c443045fe33"
     settings.name_identifier_format           = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-    File.open(File.dirname(__FILE__) + '/../../fixtures/ca.key') do |file|
+    File.open(File.dirname(__FILE__) + '/../../fixtures/sp.key') do |file|
       settings.private_key = file.read
     end
     settings.private_key_password = "ruby-saml"

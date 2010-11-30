@@ -48,7 +48,7 @@ describe Onelogin::Saml::Settings do
   end
 
   describe "sp_yaml" do
-    let(:private_key_path) { File.dirname(__FILE__) + "/../../fixtures/ca.key" }
+    let(:private_key_path) { File.dirname(__FILE__) + "/../../fixtures/sp.key" }
     let(:private_key_text) { File.open(private_key_path) {|file| file.read }}
 
     before(:each) do
