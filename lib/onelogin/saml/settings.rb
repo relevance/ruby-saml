@@ -87,7 +87,7 @@ module Onelogin::Saml
       @name_identifier_format || name_identifier_format_from_config
     end
 
-    private
+    protected
 
     SSO_ELEMENT_PATH = "/EntityDescriptor/IDPSSODescriptor/SingleSignOnService[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']"
     X509_CERT_PATH = "/EntityDescriptor/IDPSSODescriptor/KeyDescriptor/ds:KeyInfo/ds:X509Data/ds:X509Certificate"

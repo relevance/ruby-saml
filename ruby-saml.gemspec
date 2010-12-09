@@ -3,7 +3,7 @@
 
 Gem::Specification.new do |s|
   s.name        = "ruby-saml"
-  s.version = "0.0.4"
+  s.version = "0.0.5"
   # s.version     = Foo::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors = ["OneLogin LLC"]
