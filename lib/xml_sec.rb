@@ -36,7 +36,7 @@ module XMLSecurity
     DS_NAMESPACE = {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}
 
     def validate_fingerprint(idp_cert_fingerprint, logger = nil)
-      debug("Received cert: #{cert}",logger)
+      debug("Received cert:\n#{cert}",logger)
       
       fingerprint = Digest::SHA1.hexdigest(cert.to_der)
       expected_fingerprint = idp_cert_fingerprint.gsub(":","").downcase
@@ -61,10 +61,10 @@ module XMLSecurity
         debug("Digest URI: #{uri}",logger)
 
         hashed_element = REXML::XPath.first(doc, "//[@ID='#{uri[1,uri.size]}']")
-        debug("Hashed element: #{hashed_element}",logger)
+        debug("Hashed element:\n#{hashed_element}",logger)
 
         canon_hashed_element = canonical_form(hashed_element)
-        debug("Canonical hashed element: #{canon_hashed_element}",logger)
+        debug("Canonical hashed element:\n#{canon_hashed_element}",logger)
 
         hash = Digest::SHA1.digest(canon_hashed_element)
         digest_value = decode64_from_xpath(ref, "//ds:DigestValue")

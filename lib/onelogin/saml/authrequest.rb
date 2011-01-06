@@ -26,7 +26,7 @@ module Onelogin::Saml
         </AuthnRequest>
         EOF
 
-      @logger.debug("Raw SAML request: #{request}") unless @logger.nil?
+      @logger.debug("Raw SAML request:\n#{request}") unless @logger.nil?
       
       deflated_request  = Zlib::Deflate.deflate(request, 9)[2..-5]
       base64_request    = Base64.encode64(deflated_request)  
