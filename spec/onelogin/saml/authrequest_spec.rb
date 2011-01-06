@@ -25,5 +25,11 @@ describe Onelogin::Saml::Authrequest do
       url.should match(/RelayState=%2Fsome%2Furl/)
       url.should match(/foo=bar/)
     end
+
+    it "includes additional parameters with non-string values" do
+      url = Onelogin::Saml::Authrequest.new.create(settings, :number => 3.14159, :symbol => :some_symbol)
+      url.should match(/number=3.14159/)
+      url.should match(/symbol=some_symbol/)
+    end
   end
 end 

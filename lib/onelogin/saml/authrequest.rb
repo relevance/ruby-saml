@@ -31,7 +31,7 @@ module Onelogin::Saml
       deflated_request  = Zlib::Deflate.deflate(request, 9)[2..-5]
       base64_request    = Base64.encode64(deflated_request)  
       params["SAMLRequest"] = base64_request
-      query_string = params.map {|key, value| "#{key}=#{CGI.escape(value)}"}.join("&")
+      query_string = params.map {|key, value| "#{key}=#{CGI.escape(value.to_s)}"}.join("&")
       
       settings.idp_sso_target_url + "?#{query_string}"
     end
