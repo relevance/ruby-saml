@@ -153,6 +153,7 @@ module Onelogin::Saml
       aes_key = retrieve_symmetric_key(cipher_data)
       encrypted_assertion = Base64.decode64(cipher_data.elements[ENCRYPTED_ASSERTION_PATH].text)
       assertion_plaintext = retrieve_plaintext(encrypted_assertion, aes_key)
+      @logger.info("Assertion:\n#{assertion_plaintext}") if @logger
       assertion_doc = REXML::Document.new(assertion_plaintext).elements["/saml:Assertion"]
     end
     
