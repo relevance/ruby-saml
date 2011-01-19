@@ -3,7 +3,7 @@
 
 Gem::Specification.new do |s|
   s.name        = "ruby-saml"
-  s.version = "0.0.6"
+  s.version = "0.0.7"
   # s.version     = Foo::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors = ["OneLogin LLC"]
@@ -26,7 +26,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency "watchr", "0.7"
   s.add_development_dependency "timecop", "0.3.5"
 
-  s.files        = `git ls-files`.split("\n")
-  s.executables  = `git ls-files`.split("\n").map{|f| f =~ /^bin\/(.*)/ ? $1 : nil}.compact
+  s.files             = %w( README.rdoc Rakefile LICENSE TODO.taskpaper specs.watchr )
+  s.files            += Dir.glob("lib/**/*")
+  s.files            += Dir.glob("example/**/*")
+  s.files            += Dir.glob("pkg/**/*")
+  s.files            += Dir.glob("spec/**/*")
+  
   s.require_path = 'lib'
 end
