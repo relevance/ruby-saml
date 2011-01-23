@@ -29,8 +29,7 @@ Gem::Specification.new do |s|
   s.files             = %w( README.rdoc Rakefile LICENSE TODO.taskpaper specs.watchr )
   s.files            += Dir.glob("lib/**/*")
   s.files            += Dir.glob("example/**/*")
-  s.files            += Dir.glob("pkg/**/*")
   s.files            += Dir.glob("spec/**/*")
-  
+
   s.require_path = 'lib'
 end
