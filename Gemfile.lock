@@ -1,0 +1,44 @@
+GIT
+  remote: git://github.com/relevance/xmlcanonicalizer.git
+  revision: a3fde2f7edb4caa92957a42654e3cc2360ba7204
+  specs:
+    xmlcanonicalizer (0.1.1)
+
+PATH
+  remote: .
+  specs:
+    ruby-saml (0.0.7)
+      uuid (= 2.3.1)
+      xmlcanonicalizer (= 0.1.1)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    diff-lcs (1.1.2)
+    macaddr (1.0.0)
+    rspec (2.0.0.rc)
+      rspec-core (= 2.0.0.rc)
+      rspec-expectations (= 2.0.0.rc)
+      rspec-mocks (= 2.0.0.rc)
+    rspec-core (2.0.0.rc)
+    rspec-expectations (2.0.0.rc)
+      diff-lcs (>= 1.1.2)
+    rspec-mocks (2.0.0.rc)
+      rspec-core (= 2.0.0.rc)
+      rspec-expectations (= 2.0.0.rc)
+    timecop (0.3.5)
+    uuid (2.3.1)
+      macaddr (~> 1.0)
+    watchr (0.7)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (>= 1.0.0)
+  rspec (= 2.0.0.rc)
+  ruby-saml!
+  timecop (= 0.3.5)
+  uuid (= 2.3.1)
+  watchr (= 0.7)
+  xmlcanonicalizer (= 0.1.1)
