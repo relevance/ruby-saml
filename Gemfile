@@ -1,7 +1,6 @@
-source :gemcutter
-
-# Specify your gem's dependencies in foo.gemspec
 git "git://github.com/relevance/xmlcanonicalizer.git" do
-  gemspec
-end 
+  source :rubygems
 
+  # Specify your gem's dependencies in ruby-saml.gemspec
+  gemspec
+end
